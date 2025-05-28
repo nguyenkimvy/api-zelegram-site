@@ -126,8 +126,8 @@ export default {
     if (originalBody) {
       const parsedBody = maybeParseBody(originalBody);
 
-      if (telegramPath.includes("setWebhook") && parsedBody.url) {
-        parsedBody.url = `https://api.zelegram.site/?webhooked=${encodeURIComponent(parsedBody.url)}`;
+      if (telegramPath.includes("setWebhook") && parsedBody.url) {        
+        parsedBody.url = `${url.host}/webhook?webhooked=${encodeURIComponent(parsedBody.url)}`;
         modifiedBody = parsedBody;
       }
 
