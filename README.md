@@ -130,21 +130,6 @@ export default {
         parsedBody.url = `${url.host}/webhook?webhooked=${encodeURIComponent(parsedBody.url)}`;
         modifiedBody = parsedBody;
       }
-
-      if (telegramPath.includes("sendPhoto") && parsedBody.photo) {
-        parsedBody.photo = `https://api.zelegram.site/?files=${encodeURIComponent(parsedBody.photo)}`;
-        modifiedBody = parsedBody;
-      }
-
-      if (telegramPath.includes("sendVideo") && parsedBody.video) {
-        parsedBody.video = `https://api.zelegram.site/?files=${encodeURIComponent(parsedBody.video)}`;
-        modifiedBody = parsedBody;
-      }
-
-      if (telegramPath.includes("sendDocument") && parsedBody.document) {
-        parsedBody.document = `https://api.zelegram.site/?files=${encodeURIComponent(parsedBody.document)}`;
-        modifiedBody = parsedBody;
-      }
     }
 
     const forwardRequest = new Request(telegramUrl, {
