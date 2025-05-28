@@ -39,111 +39,30 @@ Go to [https://dash.cloudflare.com](https://dash.cloudflare.com)
 #### And replace everything with:
 ```js
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request) {
     const url = new URL(request.url);
-    const pathname = url.pathname;
-    const searchParams = url.searchParams;
-
-    if (pathname === "/" && request.method === "GET" && !url.search) {
-      return Response.redirect("https://n8npremium.com/?ref=zelegram", 302);
+    const webhooked = url.searchParams.get("webhooked");
+    
+    if (webhooked) {
+      return fetch(new Request(decodeURIComponent(webhooked), request));
     }
 
-    const telegramPath = pathname + url.search;
-    const telegramUrl = `https://api.telegram.org${telegramPath}`;
-
-    const fileUrl = searchParams.get("files");
-    if (fileUrl) {
+    let body = request.body;
+    if (url.pathname.includes("/setWebhook") && request.body) {
+      const text = await request.text();
       try {
-        const decodedUrl = decodeURIComponent(fileUrl);
-        const validatedUrl = new URL(decodedUrl);
-
-        if (!["http:", "https:"].includes(validatedUrl.protocol)) {
-          return new Response("Invalid protocol in URL", { status: 400 });
+        const json = JSON.parse(text);
+        if (json.url) {
+          json.url = `${url.protocol}//${url.host}/webhook?webhooked=${encodeURIComponent(json.url)}`;
+          body = JSON.stringify(json);
         }
-
-        const imageResponse = await fetch(validatedUrl.href);
-        if (!imageResponse.ok) {
-          return new Response(`Failed to fetch image: ${imageResponse.status}`, {
-            status: imageResponse.status,
-          });
-        }
-
-        const headers = new Headers(imageResponse.headers);
-        headers.set("Access-Control-Allow-Origin", "*");
-
-        return new Response(imageResponse.body, {
-          status: imageResponse.status,
-          headers,
-        });
-      } catch (err) {
-        return new Response(`Invalid photo URL: ${err.message}`, { status: 400 });
-      }
+      } catch { body = text; }
     }
 
-    let originalBody = null;
-    if (!["GET", "HEAD"].includes(request.method)) {
-      originalBody = await request.clone().text();
-    }
-
-    const webhooked = searchParams.get("webhooked");
-    if (telegramPath.includes("webhooked") && webhooked) {
-      try {
-        const targetUrl = decodeURIComponent(webhooked);
-        const validatedUrl = new URL(targetUrl);
-
-        if (!["http:", "https:"].includes(validatedUrl.protocol)) {
-          return new Response("Invalid protocol in webhooked URL", { status: 400 });
-        }
-
-        const forwardRequest = new Request(validatedUrl.href, {
-          method: request.method,
-          headers: request.headers,
-          body: originalBody,
-          redirect: "follow",
-        });
-
-        const response = await fetch(forwardRequest);
-        return new Response(response.body, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers,
-        });
-      } catch (err) {
-        return new Response(`Invalid webhooked URL: ${err.message}`, { status: 400 });
-      }
-    }
-
-    let modifiedBody = null;
-
-    const maybeParseBody = (body) => {
-      try {
-        return JSON.parse(body);
-      } catch {
-        return { raw: body };
-      }
-    };
-
-    if (originalBody) {
-      const parsedBody = maybeParseBody(originalBody);
-
-      if (telegramPath.includes("setWebhook") && parsedBody.url) {        
-        parsedBody.url = `${url.host}/webhook?webhooked=${encodeURIComponent(parsedBody.url)}`;
-        modifiedBody = parsedBody;
-      }
-    }
-
-    const forwardRequest = new Request(telegramUrl, {
+    return fetch(`https://api.telegram.org${url.pathname}${url.search}`, {
       method: request.method,
       headers: request.headers,
-      body: modifiedBody ? JSON.stringify(modifiedBody) : originalBody,
-      redirect: "follow",
-    });
-
-    const telegramResponse = await fetch(forwardRequest);
-    return new Response(telegramResponse.body, {
-      status: telegramResponse.status,
-      statusText: telegramResponse.statusText,
-      headers: telegramResponse.headers,
+      body
     });
   }
 }
