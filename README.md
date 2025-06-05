@@ -71,29 +71,9 @@ export default {
 
 ### 6. Click **Deploy**
 
-### 7. Copy your deployed URL (e.g. `https://api.zelegram.site`) and use it in your Telegram bot's `setWebhook`.
-
-### (Optional) Add a custom domain to the worker for production use.
-
+### 7. Copy your deployed URL 
 ## 🛡️ Disclaimer
 This project is provided "as-is" without any warranty.
-
----
-
-## 🧪 Try it live
-
-Try it:
-👉 **[https://api.zelegram.site](https://api.zelegram.site)**
-![Edit code](screenshots/tryit.png)
-
----
-
-## 🎓 Learn how to build automation with n8n + AI
-
-- 💡 Muốn học cách xây dựng quy trình automation mạnh mẽ kết hợp **n8n + AI**?
-- 👉 Tham gia ngay khoá học tại: [https://n8npremium.com](https://n8npremium.com)
-- 🌱 Tự động hoá Zalo trong n8n, Tài nguyên miễn phí, bot mẫu, cộng đồng hỗ trợ: 👉 [https://linktr.ee/n8nzalo](https://linktr.ee/n8nzalo)
-- 👉 Tự động hoá không còn là chuyện của developer — ai cũng có thể làm được!
 
 ---
 
